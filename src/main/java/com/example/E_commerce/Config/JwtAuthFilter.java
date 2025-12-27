@@ -18,50 +18,38 @@ import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private  final JwtService jwtService;
+    private final JwtService jwtService;
     private final UserRepo userRepo;
 
     public JwtAuthFilter(JwtService jwtService, UserRepo userRepo) {
         this.jwtService = jwtService;
         this.userRepo = userRepo;
-
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        1. Get Authorization header = done
-//        2. If header missing → let request continue = done
-//        3. If header exists:
-//        - Extract token
-//                - Validate token
-//                - Extract identity
-//                - Create authentication object
-//        - Store it in security context
-//        4. Continue request
-        // step one if no header call for header
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
 
-        //Ignore unauthenticated requests if header  empty and not start with Bearer
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request,response); // not there stop the process
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token=authHeader.substring(7);
-            try{
-                email=jwtService.extractEmail(token);
+            token = authHeader.substring(7);
+            try {
+                email = jwtService.extractEmail(token);
             } catch (Exception e) {
                 filterChain.doFilter(request, response);
                 return;
             }
-
         }
-
-
-
 
         var optionalUser = userRepo.findByEmail(email);
         if (email != null && optionalUser.isPresent()) {
@@ -71,17 +59,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             SimpleGrantedAuthority authority =
                     new SimpleGrantedAuthority(roleName);
-            UsernamePasswordAuthenticationToken auth =  new UsernamePasswordAuthenticationToken(
-                    email,
-                    null,
-                    List.of(authority)
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
 
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            List.of(authority)
+                    );
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
-        filterChain.doFilter(request,response);
-
-
+        filterChain.doFilter(request, response);
     }
 }

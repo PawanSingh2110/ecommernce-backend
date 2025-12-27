@@ -1,0 +1,141 @@
+package com.example.E_commerce.Impliment;
+
+import com.example.E_commerce.DTO.CreateUserRequest;
+import com.example.E_commerce.DTO.LoginRequest;
+import com.example.E_commerce.DTO.UserResponse;
+import com.example.E_commerce.Repo.UserRepo;
+import com.example.E_commerce.Service.JwtService;
+import com.example.E_commerce.Service.UserService;
+import com.example.E_commerce.modal.Role;
+import com.example.E_commerce.modal.User;
+import com.example.E_commerce.modal.UserStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;   // ✅ ADDED THIS IMPORT
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service   // ✅ ADDED: this is now the actual service bean
+public class AdminImpliement implements UserService {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
+    // create user
+    @Override
+    public UserResponse createUser(CreateUserRequest request) {
+        // 1. VALIDATION CHECKS
+        String email = request.getEmail();
+        String username = request.getUsername();
+
+        if (userRepo.existsByusername(username)) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        if (userRepo.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        if (request.getPassword().length() < 6) {
+            throw new RuntimeException("Password should be greater than 6 letters");
+        }
+
+        // 2. ROLE HANDLING (JSON role or default USER)
+        String roleStr = request.getRole();   // from JSON (can be null)
+        Role role = Role.USER;                // default
+
+        if (roleStr != null && !roleStr.isBlank()) {
+            try {
+                role = Role.valueOf(roleStr.toUpperCase());  // "ADMIN" -> Role.ADMIN
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid role: " + roleStr);
+            }
+        }
+
+        // 3. CREATE USER
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(role);                      // <- from logic above
+        user.setStatus(UserStatus.ACTIVE);       // default status
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        // 4. SAVE TO DB
+        User savedUser = userRepo.save(user);
+
+        // 5. BUILD RESPONSE
+        return new UserResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getRole(),
+                savedUser.getStatus().name(),
+                null,                      // no token on register
+                savedUser.getCreatedAt(),
+                savedUser.getUpdatedAt()
+        );
+    }
+
+
+    @Override
+    public UserResponse login(LoginRequest request) {
+        String email = request.getEmail();
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Wrong password");
+        }
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new RuntimeException("Account not active");
+        }
+
+        String jwtToken = jwtService.generateToken(email);
+
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getStatus().name(),
+                jwtToken,                            // token on login
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+    }
+
+    @Override
+    public List<UserResponse> getAllActiveUsers() {
+        return List.of(); // you can implement later
+    }
+
+    @Override
+    public UserResponse getUserById(Long id) {
+        return null; // to implement later
+    }
+
+    @Override
+    public void deactivateUser(Long id) {
+        // to implement later
+    }
+
+    @Override
+    public UserResponse searchByusername(String username) {
+        return null; // to implement later
+    }
+
+    @Override
+    public UserResponse searchByEmail(String email) {
+        return null; // to implement later
+    }
+}

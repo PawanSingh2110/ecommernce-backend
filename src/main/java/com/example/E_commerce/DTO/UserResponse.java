@@ -15,4 +15,14 @@ public class UserResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public UserResponse(Long id, String username, String email, Role role, String status, String accessToken, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.role = role;
+        this.status = status;
+        this.accessToken = accessToken;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }

@@ -4,13 +4,16 @@ import com.example.E_commerce.DTO.CreateUserRequest;
 import com.example.E_commerce.DTO.UserResponse;
 import com.example.E_commerce.DTO.LoginRequest;
 
-
 import java.util.List;
+
+// ❌ REMOVED @Service HERE
+// @Service  ← removed
 
 public interface UserService {
 
     // Basic
     UserResponse createUser(CreateUserRequest request);
+
     UserResponse login(LoginRequest request);
 
     // Admin
