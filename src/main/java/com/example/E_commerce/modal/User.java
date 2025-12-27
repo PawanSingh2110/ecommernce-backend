@@ -26,6 +26,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
+
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -43,6 +49,10 @@ public class User {
         // Auto-set status if null
         if (this.status == null) {
             this.status = UserStatus.ACTIVE;
+        }
+
+        if (this.role == null) {
+            this.role = Role.USER;
         }
     }
 
