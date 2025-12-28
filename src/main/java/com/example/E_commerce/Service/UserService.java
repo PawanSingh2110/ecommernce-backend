@@ -11,20 +11,10 @@ import java.util.List;
 
 public interface UserService {
 
-    // Basic
-    UserResponse createUser(CreateUserRequest request);
+    // PUBLIC
+    UserResponse createUser(CreateUserRequest request);   // /auth/register
+    UserResponse login(LoginRequest request);             // /auth/login
 
-    UserResponse login(LoginRequest request);
-
-    // Admin
-    List<UserResponse> getAllActiveUsers();
-
-    UserResponse getUserById(Long id);
-
-    void deactivateUser(Long id);
-
-    // Search
-    UserResponse searchByusername(String username);
-
-    UserResponse searchByEmail(String email);
+    // SELF (logged-in user)
+    UserResponse getCurrentUserByEmail(String email);
 }

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service   // ✅ ADDED: this is now the actual service bean
-public class AdminImpliement implements UserService {
+public class UserImpliement implements UserService {
 
     @Autowired
     private UserRepo userRepo;
@@ -115,27 +115,24 @@ public class AdminImpliement implements UserService {
     }
 
     @Override
-    public List<UserResponse> getAllActiveUsers() {
-        return List.of(); // you can implement later
+    public UserResponse getCurrentUserByEmail(String email) {
+
+        // 1. Find user in DB
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getStatus().name(),
+                null,                            // token on login
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
     }
 
-    @Override
-    public UserResponse getUserById(Long id) {
-        return null; // to implement later
-    }
 
-    @Override
-    public void deactivateUser(Long id) {
-        // to implement later
-    }
 
-    @Override
-    public UserResponse searchByusername(String username) {
-        return null; // to implement later
-    }
-
-    @Override
-    public UserResponse searchByEmail(String email) {
-        return null; // to implement later
-    }
 }
