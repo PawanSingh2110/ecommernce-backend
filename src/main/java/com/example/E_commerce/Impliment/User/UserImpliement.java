@@ -6,7 +6,8 @@ import com.example.E_commerce.DTO.User.UserResponse;
 import com.example.E_commerce.Repo.User.UserRepo;
 import com.example.E_commerce.Service.User.JwtService;
 import com.example.E_commerce.Service.User.UserService;
-import Role;
+
+import com.example.E_commerce.modal.User.Role;
 import com.example.E_commerce.modal.User.User;
 import com.example.E_commerce.modal.User.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
