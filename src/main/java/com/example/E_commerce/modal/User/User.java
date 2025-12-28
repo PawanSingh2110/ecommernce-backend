@@ -1,4 +1,4 @@
-package com.example.E_commerce.modal;
+package com.example.E_commerce.modal.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

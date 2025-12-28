@@ -1,4 +1,4 @@
-package com.example.E_commerce.DTO;
+package com.example.E_commerce.DTO.User;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class LoginRequest {
+public class CreateUserRequest {
+
+    @NotBlank(message = "Shopname is required")
+    private String username;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
@@ -17,6 +20,10 @@ public class LoginRequest {
 
     @NotBlank(message = "Password is required")
     private String password;
+
+    private String role;
+
+
 
 
 }

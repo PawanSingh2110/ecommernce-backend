@@ -1,6 +1,6 @@
-package com.example.E_commerce.DTO;  // ✅ Good package name
+package com.example.E_commerce.DTO.User;  // ✅ Good package name
 
-import com.example.E_commerce.modal.Role;
+import Role;
 import lombok.Data;
 import java.time.LocalDateTime;
 

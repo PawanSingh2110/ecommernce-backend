@@ -1,9 +1,9 @@
-package com.example.E_commerce.Controller;
+package com.example.E_commerce.Controller.User;
 
-import com.example.E_commerce.DTO.CreateUserRequest;
-import com.example.E_commerce.DTO.LoginRequest;
-import com.example.E_commerce.DTO.UserResponse;
-import com.example.E_commerce.Service.UserService;
+import com.example.E_commerce.DTO.User.CreateUserRequest;
+import com.example.E_commerce.DTO.User.LoginRequest;
+import com.example.E_commerce.DTO.User.UserResponse;
+import com.example.E_commerce.Service.User.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;

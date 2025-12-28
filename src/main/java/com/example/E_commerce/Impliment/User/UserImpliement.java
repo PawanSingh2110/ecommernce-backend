@@ -1,20 +1,19 @@
-package com.example.E_commerce.Impliment;
+package com.example.E_commerce.Impliment.User;
 
-import com.example.E_commerce.DTO.CreateUserRequest;
-import com.example.E_commerce.DTO.LoginRequest;
-import com.example.E_commerce.DTO.UserResponse;
-import com.example.E_commerce.Repo.UserRepo;
-import com.example.E_commerce.Service.JwtService;
-import com.example.E_commerce.Service.UserService;
-import com.example.E_commerce.modal.Role;
-import com.example.E_commerce.modal.User;
-import com.example.E_commerce.modal.UserStatus;
+import com.example.E_commerce.DTO.User.CreateUserRequest;
+import com.example.E_commerce.DTO.User.LoginRequest;
+import com.example.E_commerce.DTO.User.UserResponse;
+import com.example.E_commerce.Repo.User.UserRepo;
+import com.example.E_commerce.Service.User.JwtService;
+import com.example.E_commerce.Service.User.UserService;
+import Role;
+import com.example.E_commerce.modal.User.User;
+import com.example.E_commerce.modal.User.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;   // ✅ ADDED THIS IMPORT
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service   // ✅ ADDED: this is now the actual service bean
 public class UserImpliement implements UserService {

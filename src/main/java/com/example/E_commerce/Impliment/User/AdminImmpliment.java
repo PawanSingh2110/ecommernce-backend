@@ -1,10 +1,10 @@
-package com.example.E_commerce.Impliment;
+package com.example.E_commerce.Impliment.User;
 
-import com.example.E_commerce.DTO.UserResponse;
-import com.example.E_commerce.Repo.UserRepo;
-import com.example.E_commerce.Service.AdminUserService;
-import com.example.E_commerce.modal.User;
-import com.example.E_commerce.modal.UserStatus;
+import com.example.E_commerce.DTO.User.UserResponse;
+import com.example.E_commerce.Repo.User.UserRepo;
+import com.example.E_commerce.Service.User.AdminUserService;
+import com.example.E_commerce.modal.User.User;
+import com.example.E_commerce.modal.User.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

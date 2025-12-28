@@ -1,10 +1,8 @@
-package com.example.E_commerce.Service;
+package com.example.E_commerce.Service.User;
 
-import com.example.E_commerce.DTO.CreateUserRequest;
-import com.example.E_commerce.DTO.UserResponse;
-import com.example.E_commerce.DTO.LoginRequest;
-
-import java.util.List;
+import com.example.E_commerce.DTO.User.CreateUserRequest;
+import com.example.E_commerce.DTO.User.UserResponse;
+import com.example.E_commerce.DTO.User.LoginRequest;
 
 // ❌ REMOVED @Service HERE
 // @Service  ← removed

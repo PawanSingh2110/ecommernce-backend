@@ -1,6 +1,6 @@
-package com.example.E_commerce.Service;
+package com.example.E_commerce.Service.User;
 
-import com.example.E_commerce.DTO.UserResponse;
+import com.example.E_commerce.DTO.User.UserResponse;
 
 import java.util.List;
 

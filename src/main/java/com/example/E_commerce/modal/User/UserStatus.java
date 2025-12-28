@@ -1,4 +1,4 @@
-package com.example.E_commerce.modal;
+package com.example.E_commerce.modal.User;
 
 public enum UserStatus {
     ACTIVE,

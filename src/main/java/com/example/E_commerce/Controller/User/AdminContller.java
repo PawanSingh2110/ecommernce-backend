@@ -1,7 +1,7 @@
-package com.example.E_commerce.Controller;
+package com.example.E_commerce.Controller.User;
 
-import com.example.E_commerce.DTO.UserResponse;
-import com.example.E_commerce.Service.AdminUserService;
+import com.example.E_commerce.DTO.User.UserResponse;
+import com.example.E_commerce.Service.User.AdminUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

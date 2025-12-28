@@ -1,7 +1,7 @@
-package com.example.E_commerce.Repo;
+package com.example.E_commerce.Repo.User;
 
-import com.example.E_commerce.modal.User;
-import com.example.E_commerce.modal.UserStatus;
+import com.example.E_commerce.modal.User.User;
+import com.example.E_commerce.modal.User.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

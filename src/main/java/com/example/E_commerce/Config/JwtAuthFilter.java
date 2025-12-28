@@ -1,8 +1,8 @@
 package com.example.E_commerce.Config;
 
-import com.example.E_commerce.Repo.UserRepo;
-import com.example.E_commerce.Service.JwtService;
-import com.example.E_commerce.modal.User;
+import com.example.E_commerce.Repo.User.UserRepo;
+import com.example.E_commerce.Service.User.JwtService;
+import com.example.E_commerce.modal.User.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
