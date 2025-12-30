@@ -1,8 +1,11 @@
 package com.example.E_commerce.Config;
 
+import com.example.E_commerce.Config.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,44 +23,83 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtAuthFilter jwtAuthFilter;
+
     @Value("${frontend.url:http://localhost:5173}")
     private String frontend;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            JwtAuthFilter jwtAuthFilter
-    ) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+                // CORS + CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+
+                // Stateless JWT
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
+                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC
+
+                        // AUTH – PUBLIC
                         .requestMatchers(
-                                "/users/login",
-                                "/users/register"
+                                "/auth/login",
+                                "/auth/register"
                         ).permitAll()
 
-                        // ADMIN
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        // PUBLIC PRODUCT BROWSING
+                        .requestMatchers(
+                                "/categories/**",
+                                "/hoodies/**",
+                                "/reviews/hoodie/**"
+                        ).permitAll()
 
-                        // EVERYTHING ELSE NEEDS AUTH
+                        // USER APIs
+                        .requestMatchers(
+                                "/users/**",
+                                "/cart/**",
+                                "/orders/**",
+                                "/payments/**",
+                                "/addresses/**",
+                                "/reviews"
+                        ).hasRole("USER")
+
+                        // ADMIN APIs
+                        .requestMatchers(
+                                "/admin/**"
+                        ).hasRole("ADMIN")
+
+                        // EVERYTHING ELSE
                         .anyRequest().authenticated()
                 )
+
+                // JWT FILTER
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // PASSWORD ENCODER
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // AUTH MANAGER
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    // CORS CONFIG
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

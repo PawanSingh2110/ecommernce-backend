@@ -3,6 +3,8 @@ package com.example.E_commerce.Config;
 import com.example.E_commerce.Repo.User.UserRepo;
 import com.example.E_commerce.Service.User.JwtService;
 import com.example.E_commerce.modal.User.User;
+import com.example.E_commerce.modal.User.UserStatus;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -35,50 +38,69 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // Already authenticated → skip
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        String jwt = null;
 
-        String token = null;
-
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
+        // 🔍 1. Read JWT from cookie
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
                 if ("jwtToken".equals(cookie.getName())) {
-                    token = cookie.getValue();
+                    jwt = cookie.getValue();
                     break;
                 }
             }
         }
 
-        if (token == null) {
+        // No token → continue filter chain
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        String email;
         try {
-            String email = jwtService.extractEmail(token);
+            email = jwtService.extractUsername(jwt);
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            User user = userRepo.findByEmail(email)
-                    .orElse(null);
+        // Already authenticated → skip
+        if (email != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (user != null) {
+            User user = userRepo.findByEmail(email).orElse(null);
+
+            // User not found or inactive
+            if (user == null || user.getStatus() != UserStatus.ACTIVE) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // Validate token
+            if (jwtService.isTokenValid(jwt, user)) {
+
                 SimpleGrantedAuthority authority =
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+                        new SimpleGrantedAuthority(
+                                "ROLE_" + user.getRole().name()
+                        );
 
-                UsernamePasswordAuthenticationToken auth =
+                UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                email,
+                                user,
                                 null,
                                 List.of(authority)
                         );
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
 
-        } catch (Exception ignored) {}
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authToken);
+            }
+        }
 
         filterChain.doFilter(request, response);
     }

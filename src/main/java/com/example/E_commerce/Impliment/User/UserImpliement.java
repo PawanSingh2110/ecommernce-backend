@@ -100,7 +100,7 @@ public class UserImpliement implements UserService {
             throw new RuntimeException("Account not active");
         }
 
-        String jwtToken = jwtService.generateToken(email);
+        String jwtToken = jwtService.generateToken(user);
 
         return new UserResponse(
                 user.getId(),
