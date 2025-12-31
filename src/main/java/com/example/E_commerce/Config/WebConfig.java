@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 🔥 CHANGE 5: ABSOLUTE PATH (matches service)
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:src/main/resources/static/uploads/");
+                .addResourceLocations("file:uploads/");
         // WAS: "file:uploads/"
     }
 }

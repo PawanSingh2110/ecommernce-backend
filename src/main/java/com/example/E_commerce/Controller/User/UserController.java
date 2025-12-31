@@ -54,8 +54,8 @@ public class UserController {
         );
     }
 
-    @PreAuthorize("hasRole('USER')")
     @PostMapping("/auth/logout")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("jwtToken", null);
         cookie.setHttpOnly(true);
@@ -70,8 +70,8 @@ public class UserController {
 
     // ================= USER =================
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/users/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> me(Authentication authentication) {
 
         User userEntity = (User) authentication.getPrincipal();

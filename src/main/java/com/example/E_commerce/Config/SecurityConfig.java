@@ -57,11 +57,18 @@ public class SecurityConfig {
                         // PUBLIC PRODUCT BROWSING
                         .requestMatchers(
                                 "/categories/**",
-                                "/hoodies/**",
-                                "/reviews/hoodie/**"
+                                "/products"
                         ).permitAll()
 
-                        // USER APIs
+                        .requestMatchers(
+                                "/images/**",
+                                "/uploads/**"
+                        ).permitAll()
+
+                        // ✅ IMPORTANT: ME endpoint → ANY authenticated user
+                        .requestMatchers("/users/me").authenticated()
+
+                        // USER APIs (excluding /me)
                         .requestMatchers(
                                 "/users/**",
                                 "/cart/**",
@@ -80,26 +87,25 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
+
                 // JWT FILTER
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // PASSWORD ENCODER
+    // Keep all your other beans EXACTLY same
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // AUTH MANAGER
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // CORS CONFIG
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +41,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String jwt = null;
 
-        // 🔍 1. Read JWT from cookie
+        // 1️⃣ Read JWT from cookie
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwtToken".equals(cookie.getName())) {
@@ -50,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        // No token → continue filter chain
+        // No token → unauthenticated, continue
         if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
@@ -64,7 +65,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Already authenticated → skip
+        // Authenticate only if context is empty
         if (email != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -79,6 +80,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Validate token
             if (jwtService.isTokenValid(jwt, user)) {
 
+                // ✅ Authority creation stays here (since User is NOT UserDetails)
                 SimpleGrantedAuthority authority =
                         new SimpleGrantedAuthority(
                                 "ROLE_" + user.getRole().name()
@@ -96,6 +98,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 .buildDetails(request)
                 );
 
+                // ✅ Authentication ONLY (no role logic beyond this)
                 SecurityContextHolder
                         .getContext()
                         .setAuthentication(authToken);

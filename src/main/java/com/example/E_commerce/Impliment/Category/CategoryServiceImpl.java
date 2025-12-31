@@ -28,6 +28,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDTO createCategory(CategoryRequestDTO request) {
+
+        // ===== SLUG GENERATION =====
         String baseSlug = request.getName()
                 .toLowerCase()
                 .trim()
@@ -42,34 +44,44 @@ public class CategoryServiceImpl implements CategoryService {
 
         MultipartFile image = request.getImage();
         if (image == null || image.isEmpty()) {
-            // 🔥 CHANGE 1: Better error
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image is required");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Category image is required"
+            );
         }
 
-        String original = image.getOriginalFilename();
-        String ext = (original != null && original.contains("."))
-                ? original.substring(original.lastIndexOf("."))
+        // ===== FILE NAME =====
+        String originalName = image.getOriginalFilename();
+        String extension = (originalName != null && originalName.contains("."))
+                ? originalName.substring(originalName.lastIndexOf("."))
                 : ".png";
 
-        String fileName = slug + ext;
-        // 🔥 CHANGE 2: ABSOLUTE PATH (MAIN FIX!)
-        Path uploadDir = Paths.get("src/main/resources/static/uploads/categories");
-        // WAS: Paths.get("uploads/categories");
+        String fileName = slug + extension;
+
+        // ✅ CORRECT RELATIVE PATH
+        Path uploadDir = Paths.get("uploads/categories");
 
         try {
+            // ✅ CREATE DIRECTORY IF NOT EXISTS
             Files.createDirectories(uploadDir);
+
+            // ✅ SAVE FILE
             Files.copy(
                     image.getInputStream(),
                     uploadDir.resolve(fileName),
                     StandardCopyOption.REPLACE_EXISTING
             );
         } catch (Exception e) {
-            // 🔥 CHANGE 3: Better error
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Image upload failed: " + e.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Image upload failed"
+            );
         }
 
+        // ✅ PUBLIC URL (THIS IS WHAT FRONTEND USES)
         String imageUrl = "/uploads/categories/" + fileName;
 
+        // ===== SAVE CATEGORY =====
         Category category = new Category();
         category.setName(request.getName());
         category.setSlug(slug);
